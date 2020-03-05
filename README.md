@@ -1,3 +1,9 @@
+Forked from:
+[https://github.com/eriklindernoren/PyTorch-YOLOv3](PyTorch-YOLOv3).
+
+Current changes:
+ - Fixed serialization when using custom dataset(s).
+
 # PyTorch-YOLOv3
 A minimal PyTorch implementation of YOLOv3, with support for training, inference and evaluation.
 
