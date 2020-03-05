@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # If specified we start from checkpoint
     if opt.pretrained_weights:
         if opt.pretrained_weights.endswith(".pth"):
-            model.load_state_dict(torch.load(opt.pretrained_weights))
+            model = torch.load(opt.pretrained_weights, map_location=device)
         else:
             model.load_darknet_weights(opt.pretrained_weights)
 
@@ -175,4 +175,4 @@ if __name__ == "__main__":
             print(f"---- mAP {AP.mean()}")
 
         if epoch % opt.checkpoint_interval == 0:
-            torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % epoch)
+            torch.save(model, f"checkpoints/yolov3_ckpt_%d.pth" % epoch)

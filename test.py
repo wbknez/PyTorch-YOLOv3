@@ -84,7 +84,7 @@ if __name__ == "__main__":
         model.load_darknet_weights(opt.weights_path)
     else:
         # Load checkpoint weights
-        model.load_state_dict(torch.load(opt.weights_path))
+        model = torch.load(opt.weights_path, map_location=device)
 
     print("Compute mAP...")
 
