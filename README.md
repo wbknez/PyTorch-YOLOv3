@@ -2,7 +2,9 @@ Forked from:
 [https://github.com/eriklindernoren/PyTorch-YOLOv3](PyTorch-YOLOv3).
 
 Current changes:
+ - Added `visualize.py` script to compare detected regions with their targets.
  - Fixed serialization when using custom dataset(s).
+ - Fixed detection by loading all images as RGB.
 
 # PyTorch-YOLOv3
 A minimal PyTorch implementation of YOLOv3, with support for training, inference and evaluation.
