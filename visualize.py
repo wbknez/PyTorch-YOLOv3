@@ -17,11 +17,13 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torch.autograd import Variable
 
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import NullLocator
-
-plt.use('Agg')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -93,10 +95,14 @@ if __name__ == "__main__":
         prev_time = current_time
         print("\t+ Batch %d, Inference Time: %s" % (batch_i, inference_time))
 
+        print(f"\t\tPaths: {img_paths}")
+        print(f"\t\tDetections: {detections}")
+        print(f"\t\tTargets: {targets}")
+
         # Save image and detections
         imgs.extend(img_paths)
         img_detections.extend(detections)
-        target_boxes.extend(targets)
+        target_boxes.append(targets)
 
     # Bounding-box colors
     cmap = plt.get_cmap("bone")
@@ -112,13 +118,29 @@ if __name__ == "__main__":
     for img_i, (path, detections, targets) in enumerate(zip(imgs,
                                                             img_detections,
                                                             target_boxes)):
-
         print("(%d) Image: '%s'" % (img_i, path))
 
         # Create plot.
         img = np.array(Image.open(path))
         fig, ax = plt.subplots(1)
         ax.imshow(img, cmap=cmap)
+
+        if targets is not None:
+            targets = targets[:, 2:6]
+            targets = xywh2xyxy(targets * opt.img_size)
+
+            for index, (x1, y1, x2, y2) in enumerate(targets):
+                print("\t- Label: Target, Box: %s" % str(targets))
+
+                box_w = x2 - x1
+                box_h = y2 - y1
+
+                # Create a Rectangle patch
+                bbox = patches.Rectangle((x1, y1), box_w, box_h,
+                                         linewidth=2, edgecolor=colors[1],
+                                         facecolor="none")
+                # Add the bbox to the plot
+                ax.add_patch(bbox)
 
         # Draw bounding boxes and labels of detections
         if detections is not None:
@@ -143,35 +165,10 @@ if __name__ == "__main__":
                 plt.text(
                     x1,
                     y1,
-                    s="G",
+                    s="%.0f%%" % (cls_conf.item() * 100),
                     color="white",
                     verticalalignment="top",
                     bbox={"color": colors[0], "pad": 0},
-                )
-
-        if targets is not None:
-            targets = rescale_boxes(targets, opt.img_size, img.shape[:2])
-
-            for class_pred, x1, y1, x2, y2 in targets:
-                print("\t- Label: %s", class_pred)
-
-                box_w = x2 - x1
-                box_h = y2 - y1
-
-                # Create a Rectangle patch
-                bbox = patches.Rectangle((x1, y1), box_w, box_h,
-                                         linewidth=2, edgecolor=colors[1],
-                                         facecolor="none")
-                # Add the bbox to the plot
-                ax.add_patch(bbox)
-                # Add label
-                plt.text(
-                    x1,
-                    y1,
-                    s="T",
-                    color="white",
-                    verticalalignment="top",
-                    bbox={"color": colors[1], "pad": 0},
                 )
 
         # Save generated image with detections
